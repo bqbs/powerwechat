@@ -19,15 +19,16 @@ def text_reply_group(msg):
 
 @itchat.msg_register(TEXT)
 def text_reply(msg):
-    print msg
     if msg['ToUserName'] == u'filehelper':
-        print '\n######################true'
         itchat.send('%s: %s' % (msg['Type'], msg['Text']))
+    else:
+        itchat.send('%s from %s' % (msg['Type'], msg['']))
 
 
 def main():
     itchat.auto_login()
     itchat.run()
+    itchat.dump_login_status()
 
 
 if __name__ == '__main__':
