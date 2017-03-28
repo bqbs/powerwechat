@@ -1,1 +1,3 @@
 # powerwechat
+
+`python power.py`
