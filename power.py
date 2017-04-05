@@ -7,9 +7,20 @@ from itchat.content import *
 
 import Tuling
 import music
+import json
 
-isDebug = True
+config = None
 isLife = True
+reply = None
+
+
+def init():
+    global isLife
+    global reply
+    load_json()
+    if config is not None:
+        isLife = config['autoreply']
+        reply = config['reply']
 
 
 @itchat.msg_register(itchat.content.TEXT)
@@ -29,24 +40,48 @@ def text_reply_group(msg):
 @itchat.msg_register(TEXT)
 def text_reply(msg):
     global isLife
+    global reply
     if msg['ToUserName'] == u'filehelper':
         if u'on' in msg['Text']:
             isLife = True
+            config['autoreply'] = True
             itchat.send(u'打开自动回复', u'filehelper')
         elif u'off' in msg['Text']:
-            isLife = False
+            isLife = True
+            config['autoreply'] = False
             itchat.send(u'关闭自动回复', u'filehelper')
         elif u'music' in msg['Text']:
-            reply = music.music_player(msg['Text'])
-            itchat.send(reply, u'filehelper')
+            text = music.music_player(msg['Text'])
+            itchat.send(text, u'filehelper')
+        elif u'reply' in msg['Text']:
+            l = msg['Text'].split(' ')
+            if len(l) >= 2:
+                reply = l[1]
     else:
         if isLife:
-            reply = Tuling.get_response(msg['Text'])
-            # print(reply)
-            itchat.send(reply + u'(来自图灵机器人)' or u'我的主人不在(来自自动回复机器人)', msg['FromUserName'])
+            if reply:
+                text = reply
+            else:
+                text = Tuling.get_response(msg['Text'])
+            text += u'--来自自动回复机器人'
+            itchat.send(text, msg['FromUserName'])
+
+
+def load_json():
+    global config
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+
+def dump_json():
+    global config
+    with open('config.json', 'w') as f:
+        json.dump(config, f)
 
 
 def main():
+    init()
+
     itchat.auto_login(hotReload=True)
     itchat.run()
     itchat.dump_login_status()
