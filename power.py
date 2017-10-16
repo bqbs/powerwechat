@@ -1,9 +1,12 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+# coding=utf8
+# !/usr/bin/python
+
+
 __author__ = 'bat'
 
 import itchat
 from itchat.content import *
+import batman
 
 import Tuling
 import music
@@ -31,6 +34,7 @@ def text_reply(msg):
 @itchat.msg_register(TEXT, isGroupChat=True)
 def text_reply_group(msg):
     if msg['isAt']:
+        batman.calling_batman()
         if isLife:
             reply = Tuling.get_response(msg['Content'])
             itchat.send(reply + u'(来自图灵机器人)' or u'@%s\u2005I received: %s' % (msg['ActualNickName'], msg['Content']),
@@ -47,6 +51,7 @@ def text_reply(msg):
             config['autoreply'] = True
             itchat.send(u'打开自动回复', u'filehelper')
         elif u'off' in msg['Text']:
+            batman.stop_calling_batman()
             isLife = True
             config['autoreply'] = False
             itchat.send(u'关闭自动回复', u'filehelper')
@@ -57,7 +62,11 @@ def text_reply(msg):
             l = msg['Text'].split(' ')
             if len(l) >= 2:
                 reply = l[1]
+            else:
+                # todo
+                pass
     else:
+        batman.calling_batman()
         if isLife:
             if reply:
                 text = reply
